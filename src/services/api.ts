@@ -82,6 +82,9 @@ export async function getGovMetrics(): Promise<GovDashboardMetrics> {
   return Promise.resolve({
     ...GOV_METRICS,
     totalBusinesses: businessesState.length,
+    verifiedCount: businessesState.filter(b => b.officialStatus === 'VERIFIED').length,
+    conditionalCount: businessesState.filter(b => b.officialStatus === 'CONDITIONAL').length,
+    pendingCount: businessesState.filter(b => b.officialStatus === 'PENDING').length,
     openReportsCount: reportsState.filter(r => r.status !== 'RESOLVED').length,
   });
 }

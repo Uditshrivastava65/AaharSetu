@@ -17,33 +17,33 @@ export const VerificationBadge: React.FC<VerificationBadgeProps> = ({
 }) => {
   const configs = {
     VERIFIED: {
-      bg: 'bg-[#EBF7EE]',
-      text: 'text-[#1B5E20]',
-      border: 'border-[#C8E6C9]',
+      bg: 'bg-[#ECFDF5]',
+      text: 'text-[#14532D]',
+      border: 'border-[#86EFAC]',
       icon: CheckCircle2,
       label: 'Verified',
       hindiLabel: 'सत्यापित',
     },
     CONDITIONAL: {
-      bg: 'bg-[#FEF7EC]',
-      text: 'text-[#B45309]',
-      border: 'border-[#FDE68A]',
+      bg: 'bg-[#FFFBEB]',
+      text: 'text-[#92400E]',
+      border: 'border-[#FCD34D]',
       icon: AlertCircle,
       label: 'Conditional',
       hindiLabel: 'सशर्त स्वीकृत',
     },
     PENDING: {
       bg: 'bg-[#F1F5F9]',
-      text: 'text-[#475569]',
+      text: 'text-[#334155]',
       border: 'border-[#CBD5E1]',
       icon: Clock,
-      label: 'Under Verification',
+      label: 'Under Review',
       hindiLabel: 'सत्यापनाधीन',
     },
     'NOT AVAILABLE': {
-      bg: 'bg-[#F3F4F6]',
-      text: 'text-[#6B7280]',
-      border: 'border-[#E5E7EB]',
+      bg: 'bg-[#F8FAFC]',
+      text: 'text-[#475569]',
+      border: 'border-[#CBD5E1]',
       icon: HelpCircle,
       label: 'Info Unavailable',
       hindiLabel: 'जानकारी उपलब्ध नहीं',
@@ -62,9 +62,9 @@ export const VerificationBadge: React.FC<VerificationBadgeProps> = ({
   const IconComponent = current.icon;
 
   const sizeClasses = {
-    sm: 'text-[11px] px-2 py-0.5 gap-1 font-medium',
+    sm: 'text-[11px] px-2 py-0.5 gap-1 font-semibold',
     md: 'text-xs px-2.5 py-1 gap-1.5 font-semibold',
-    lg: 'text-sm px-3.5 py-1.5 gap-2 font-bold',
+    lg: 'text-sm px-3 py-1.5 gap-2 font-bold',
   };
 
   const iconSizes = {
@@ -75,7 +75,7 @@ export const VerificationBadge: React.FC<VerificationBadgeProps> = ({
 
   return (
     <span
-      className={`inline-flex items-center rounded-full border transition-all ${current.bg} ${current.text} ${current.border} ${sizeClasses[size]} ${className}`}
+      className={`inline-flex items-center rounded-md border whitespace-nowrap shrink-0 transition-colors ${current.bg} ${current.text} ${current.border} ${sizeClasses[size]} ${className}`}
       title={`Official Status: ${current.label}`}
     >
       <IconComponent className={`${iconSizes[size]} shrink-0`} />

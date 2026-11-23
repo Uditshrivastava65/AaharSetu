@@ -14,31 +14,31 @@ export const Logo: React.FC<LogoProps> = ({
   isHindi = false,
 }) => {
   const iconSizes = {
-    sm: 'w-6 h-6',
-    md: 'w-8 h-8',
-    lg: 'w-10 h-10',
+    sm: 'w-7 h-7',
+    md: 'w-9 h-9',
+    lg: 'w-11 h-11',
     xl: 'w-14 h-14',
   };
 
   const textSizes = {
     sm: 'text-base tracking-tight',
-    md: 'text-xl tracking-tight',
-    lg: 'text-2xl tracking-tight',
-    xl: 'text-3xl tracking-tight',
+    md: 'text-lg tracking-tight',
+    lg: 'text-xl tracking-tight',
+    xl: 'text-2xl tracking-tight',
   };
 
   const isLight = variant === 'light';
 
   return (
-    <div className={`flex items-center gap-2.5 select-none ${className}`}>
-      {/* Icon: Bridge arc + Harvest leaf / plate + Verification Check */}
+    <div className={`flex items-center gap-2.5 select-none whitespace-nowrap shrink-0 ${className}`}>
+      {/* Official Civic Crest: Sovereign Shield + Bridge Arch + Verification Check */}
       <div
-        className={`relative flex items-center justify-center rounded-xl transition-transform duration-300 hover:scale-105 ${
+        className={`relative flex items-center justify-center rounded-lg border transition-colors ${
           iconSizes[size]
         } ${
           isLight
-            ? 'bg-[#FDFCF8] text-[#1B4332] shadow-sm'
-            : 'bg-[#1B4332] text-[#FDFCF8] shadow-md'
+            ? 'bg-white/10 border-white/20 text-white'
+            : 'bg-[#0B2545] border-[#1E3A5F] text-white shadow-xs'
         }`}
       >
         <svg
@@ -48,32 +48,35 @@ export const Logo: React.FC<LogoProps> = ({
           className="w-full h-full p-1.5"
           aria-hidden="true"
         >
-          {/* Bridge Arc (Setu) */}
+          {/* Outer Shield Silhouette */}
           <path
-            d="M 6 28 C 12 18, 28 18, 34 28"
-            stroke={isLight ? '#1B4332' : '#FDFCF8'}
-            strokeWidth="2.5"
+            d="M20 4L7 9V19C7 27.5 12.6 34.4 20 36.5C27.4 34.4 33 27.5 33 19V9L20 4Z"
+            stroke="#D97706"
+            strokeWidth="2"
+            fill={isLight ? 'rgba(255,255,255,0.08)' : '#13315C'}
+          />
+          {/* Bridge Arch (Setu) */}
+          <path
+            d="M11 23C14.5 16.5 25.5 16.5 29 23"
+            stroke="#FFFFFF"
+            strokeWidth="2.2"
             strokeLinecap="round"
           />
-          {/* Plate / Base Foundation */}
-          <ellipse
-            cx="20"
-            cy="29"
-            rx="12"
-            ry="2.5"
-            fill={isLight ? '#E67E22' : '#E67E22'}
-            opacity="0.9"
-          />
-          {/* Sprout / Leaf of Pure Food (Aahar) */}
-          <path
-            d="M 20 22 C 16 16, 20 9, 20 9 C 20 9, 24 16, 20 22 Z"
-            fill={isLight ? '#2D7A4D' : '#52B788'}
-          />
-          {/* Verification Check Mark */}
-          <path
-            d="M 16 18 L 19 21 L 25 14"
-            stroke={isLight ? '#FFFFFF' : '#1B4332'}
+          {/* Base Horizon */}
+          <line
+            x1="10"
+            y1="25.5"
+            x2="30"
+            y2="25.5"
+            stroke="#D97706"
             strokeWidth="2"
+            strokeLinecap="round"
+          />
+          {/* Verification Checkmark */}
+          <path
+            d="M16.5 14.5L19 17L24 11.5"
+            stroke="#34D399"
+            strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
@@ -81,23 +84,20 @@ export const Logo: React.FC<LogoProps> = ({
       </div>
 
       {variant !== 'icon-only' && (
-        <div className="flex flex-col">
-          <div className="flex items-baseline gap-1.5">
-            <span
-              className={`font-bold uppercase tracking-tight leading-none ${
-                textSizes[size]
-              } ${isLight ? 'text-white' : 'text-[#1B4332]'}`}
-            >
-              {isHindi ? 'आहारसेतु' : 'AAHARSETU'}
-            </span>
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#E67E22]" />
-          </div>
+        <div className="flex flex-col text-left">
           <span
-            className={`text-[10px] uppercase tracking-widest font-semibold ${
-              isLight ? 'text-white/80' : 'text-[#2D3436]/60'
+            className={`font-serif font-bold uppercase tracking-tight leading-none ${
+              textSizes[size]
+            } ${isLight ? 'text-white' : 'text-[#0B2545]'}`}
+          >
+            {isHindi ? 'आहारसेतु' : 'AAHARSETU'}
+          </span>
+          <span
+            className={`text-[10px] uppercase tracking-widest font-semibold mt-0.5 ${
+              isLight ? 'text-[#94A3B8]' : 'text-[#475569]'
             }`}
           >
-            {isHindi ? 'भरोसा • शुद्धता • पारदर्शिता' : 'Know. Verify. Eat.'}
+            {isHindi ? 'खाद्य पारदर्शिता पोर्टल' : 'Public Food Transparency'}
           </span>
         </div>
       )}

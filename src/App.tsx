@@ -27,6 +27,7 @@ export default function App() {
   const [isHindi, setIsHindi] = useState<boolean>(false);
   const [aiInitialPrompt, setAiInitialPrompt] = useState<string | undefined>(undefined);
   const [preselectedReportBiz, setPreselectedReportBiz] = useState<Business | null>(null);
+  const [exploreInitialSearch, setExploreInitialSearch] = useState<string>('');
 
   // Load initial businesses from mock data service
   useEffect(() => {
@@ -73,7 +74,12 @@ export default function App() {
 
   const handleSearchSelect = async (query: string) => {
     const clean = query.trim();
-    // Try matching UFBI
+    if (!clean) {
+      setExploreInitialSearch('');
+      setActiveTab('explore');
+      return;
+    }
+    // Try exact matching UFBI
     const byUfbi = await getBusinessByUfbi(clean);
     if (byUfbi) {
       setSelectedBusiness(byUfbi);
@@ -81,22 +87,13 @@ export default function App() {
       return;
     }
 
-    // Try finding by name
-    const byName = businesses.find(b =>
-      b.name.toLowerCase().includes(clean.toLowerCase())
-    );
-    if (byName) {
-      setSelectedBusiness(byName);
-      setActiveTab('business-detail');
-      return;
-    }
-
-    // Fallback: go to explore tab with search query
+    // Fallback: go to explore tab with search query prefilled
+    setExploreInitialSearch(clean);
     setActiveTab('explore');
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FDFCF8] text-[#2D3436] font-sans antialiased selection:bg-[#E67E22]/20 selection:text-[#1B4332]">
+    <div className="min-h-screen flex flex-col bg-[#E7ECF1] text-[#0F172A] font-sans antialiased selection:bg-[#0B2545]/15 selection:text-[#0B2545]">
       {/* Universal Header */}
       <Header
         activeTab={activeTab}
@@ -116,6 +113,7 @@ export default function App() {
             setSelectedBusiness={handleSelectBusiness}
             onOpenQrBoard={biz => setQrModalBusiness(biz)}
             onOpenScan={() => setActiveTab('scan')}
+            onSearchSelect={handleSearchSelect}
             isHindi={isHindi}
           />
         )}
@@ -125,6 +123,7 @@ export default function App() {
             businesses={businesses}
             onSelectBusiness={handleSelectBusiness}
             onOpenQrBoard={biz => setQrModalBusiness(biz)}
+            initialSearchQuery={exploreInitialSearch}
             isHindi={isHindi}
           />
         )}

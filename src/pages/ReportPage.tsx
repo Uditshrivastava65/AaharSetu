@@ -1,15 +1,9 @@
 import React, { useState } from 'react';
 import {
   Flag,
-  Search,
   CheckCircle2,
   AlertCircle,
-  Clock,
   UploadCloud,
-  FileText,
-  ShieldCheck,
-  ArrowRight,
-  RefreshCw,
 } from 'lucide-react';
 import { Business, CitizenReport } from '../types';
 import { submitComplaint, trackComplaint } from '../services/api';
@@ -38,8 +32,8 @@ export const ReportPage: React.FC<ReportPageProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedReport, setSubmittedReport] = useState<CitizenReport | null>(null);
 
-  // Track Form state
-  const [trackingIdInput, setTrackingIdInput] = useState('REP-JBP-8421');
+  // Track Form state (uses real sample ID from DEMO_REPORTS)
+  const [trackingIdInput, setTrackingIdInput] = useState('REP-JBP-8492');
   const [trackedReport, setTrackedReport] = useState<CitizenReport | null>(null);
   const [trackError, setTrackError] = useState(false);
   const [isTrackSearching, setIsTrackSearching] = useState(false);
@@ -107,10 +101,12 @@ export const ReportPage: React.FC<ReportPageProps> = ({
       case 'REPORT RECEIVED':
         return 1;
       case 'PRELIMINARY REVIEW':
+      case 'UNDER REVIEW':
         return 2;
       case 'ASSIGNED TO WARD OFFICER':
         return 3;
       case 'FIELD INSPECTION SCHEDULED':
+      case 'OFFICIAL FINDING':
         return 4;
       case 'RESOLVED':
         return 5;
@@ -121,67 +117,66 @@ export const ReportPage: React.FC<ReportPageProps> = ({
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Title */}
-      <div className="space-y-2 text-center">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF0E6] text-[#D97724] text-xs font-bold uppercase tracking-wider">
+      {/* Header Banner */}
+      <div className="bg-[#0B2545] text-white rounded-xl p-6 sm:p-8 border border-[#1E3A5F] shadow-md gov-grid-pattern text-center space-y-2">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-[#071A33] border border-[#1E3A5F] text-[#FBBF24] text-xs font-bold uppercase tracking-wider">
           <Flag className="w-3.5 h-3.5" />
-          <span>{isHindi ? 'नागरिक संज्ञान एवं निवारण' : 'Citizen Grievance & Reporting'}</span>
+          <span>{isHindi ? 'नागरिक संज्ञान एवं निवारण प्रकोष्ठ' : 'Citizen Grievance Redressal Desk'}</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-[#163828] tracking-tight">
-          {isHindi ? 'खाद्य सुरक्षा संबंधी समस्या दर्ज करें' : 'Report a Food Safety Concern'}
+        <h1 className="text-2xl sm:text-4xl font-serif font-bold text-white tracking-tight">
+          {isHindi ? 'खाद्य सुरक्षा संबंधी शिकायत दर्ज करें' : 'Report a Food Safety Concern'}
         </h1>
-        <p className="text-sm text-[#5C6A62] max-w-lg mx-auto">
-          Notice an unhygienic storage issue, pest presence, or expired goods? Report it directly to
-          municipal food safety authorities.
+        <p className="text-xs sm:text-sm text-[#CBD5E1] max-w-lg mx-auto">
+          Log unhygienic food handling, storage deviations, or licensing concerns for review by
+          Jabalpur Municipal & Food Safety Authorities.
         </p>
       </div>
 
       {/* Mode Switcher: Submit new vs Track existing */}
       <div className="flex justify-center">
-        <div className="inline-flex p-1 rounded-xl bg-[#EDE6DC] border border-[#D5CBC0]">
+        <div className="inline-flex p-1 rounded-lg bg-[#DCE3EB] border border-[#CBD5E1]">
           <button
             onClick={() => setActiveMode('submit')}
-            className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${
+            className={`px-5 py-2 rounded-md text-xs font-bold transition-all ${
               activeMode === 'submit'
-                ? 'bg-white text-[#163828] shadow-xs'
-                : 'text-[#67746D] hover:text-[#163828]'
+                ? 'bg-[#0B2545] text-white shadow-xs'
+                : 'text-[#334155] hover:text-[#0B2545]'
             }`}
           >
-            {isHindi ? 'नई शिकायत दर्ज करें' : 'Submit Concern'}
+            {isHindi ? 'नई शिकायत दर्ज करें' : 'File New Grievance'}
           </button>
           <button
             onClick={() => {
               setActiveMode('track');
               handleTrackSubmit({ preventDefault: () => {} } as any);
             }}
-            className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${
+            className={`px-5 py-2 rounded-md text-xs font-bold transition-all ${
               activeMode === 'track'
-                ? 'bg-white text-[#163828] shadow-xs'
-                : 'text-[#67746D] hover:text-[#163828]'
+                ? 'bg-[#0B2545] text-white shadow-xs'
+                : 'text-[#334155] hover:text-[#0B2545]'
             }`}
           >
-            {isHindi ? 'शिकायत की स्थिति ट्रैक करें' : 'Track Existing Report'}
+            {isHindi ? 'शिकायत की स्थिति ट्रैक करें' : 'Track Grievance Status'}
           </button>
         </div>
       </div>
 
       {/* MODE 1: SUBMIT REPORT */}
       {activeMode === 'submit' && (
-        <div className="bg-white rounded-3xl border border-[#E6DFD5] p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="bg-white rounded-xl border border-[#CBD5E1] p-6 sm:p-8 shadow-xs space-y-6">
           {submittedReport ? (
-            /* Success confirmation */
             <div className="text-center py-6 space-y-4 animate-in fade-in">
-              <div className="w-16 h-16 rounded-full bg-[#EBF7EE] text-[#1B5E20] flex items-center justify-center mx-auto">
+              <div className="w-16 h-16 rounded-full bg-[#ECFDF5] border border-[#86EFAC] text-[#14532D] flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-extrabold text-[#163828]">Report Registered Successfully</h3>
-              <p className="text-xs text-[#5C6B62] max-w-md mx-auto">
-                Your report has been received by the Jabalpur Municipal Food Safety Unit. Keep your
-                tracking reference code safe.
+              <h3 className="text-xl font-serif font-bold text-[#0B2545]">Grievance Registered Successfully</h3>
+              <p className="text-xs text-[#475569] max-w-md mx-auto">
+                Your submission has been routed to the Jabalpur Municipal Food Safety Unit. Retain your
+                tracking docket reference below.
               </p>
 
-              <div className="p-4 bg-[#FAF8F5] rounded-2xl border border-[#E6DFD5] inline-block font-mono text-sm font-bold text-[#163828]">
-                Tracking ID: <span className="text-[#D97724]">{submittedReport.reportId}</span>
+              <div className="p-4 bg-[#F8FAFC] rounded-lg border border-[#CBD5E1] inline-block font-mono text-sm font-bold text-[#0B2545]">
+                Docket ID: <span className="text-[#B45309]">{submittedReport.reportId}</span>
               </div>
 
               <div className="pt-2 flex justify-center gap-3">
@@ -191,46 +186,45 @@ export const ReportPage: React.FC<ReportPageProps> = ({
                     setActiveMode('track');
                     setTrackedReport(submittedReport);
                   }}
-                  className="px-5 py-2.5 bg-[#163828] text-white text-xs font-bold rounded-xl hover:bg-[#1f4a36]"
+                  className="px-5 py-2.5 bg-[#0B2545] text-white text-xs font-bold rounded-lg hover:bg-[#13315C]"
                 >
-                  Track Status Now
+                  Track Docket Status
                 </button>
                 <button
                   onClick={() => {
                     setSubmittedReport(null);
                     setDescription('');
                   }}
-                  className="px-5 py-2.5 border border-[#D5CBC0] text-xs font-bold rounded-xl hover:bg-[#FAF8F5]"
+                  className="px-5 py-2.5 border border-[#CBD5E1] bg-white text-[#0B2545] text-xs font-bold rounded-lg hover:bg-[#F8FAFC]"
                 >
-                  Submit Another
+                  File Another
                 </button>
               </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Important Statutory Disclaimer */}
-              <div className="p-4 rounded-xl bg-[#FFFBF5] border border-[#FDE68A] text-xs text-[#92400E] flex items-start gap-3">
+              <div className="p-4 rounded-lg bg-[#FFFBEB] border border-[#FDE68A] text-xs text-[#92400E] flex items-start gap-3">
                 <AlertCircle className="w-4 h-4 text-[#B45309] shrink-0 mt-0.5" />
                 <div>
-                  <strong>Official Process Notice:</strong> A citizen report is not an official
-                  violation finding. Reports are routed to authorized authorities for preliminary
-                  evaluation, verification, and inspection prioritization.
+                  <strong>Statutory Process Notice:</strong> Citizen submissions trigger preliminary evaluation
+                  by Food Safety Officers and are not public violation findings until field-verified.
                 </div>
               </div>
 
               {/* Target Business Selection */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#163828]">
-                  Select Food Business:
+                <label className="text-xs font-bold uppercase tracking-wider text-[#0B2545]">
+                  Select Food Establishment:
                 </label>
                 <select
                   value={selectedBusinessId}
                   onChange={e => setSelectedBusinessId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#D5CBC0] bg-[#FAF8F5] text-sm text-[#163828] font-medium focus:ring-2 focus:ring-[#163828]"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] text-sm text-[#0B2545] font-medium focus:ring-2 focus:ring-[#0B2545]"
                 >
                   {businesses.map(b => (
                     <option key={b.id} value={b.id}>
-                      {b.name} ({b.locality}, UFBI: {b.ufbi})
+                      {b.name} ({b.locality} · {b.ufbi})
                     </option>
                   ))}
                 </select>
@@ -238,8 +232,8 @@ export const ReportPage: React.FC<ReportPageProps> = ({
 
               {/* Category */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#163828]">
-                  Concern Category:
+                <label className="text-xs font-bold uppercase tracking-wider text-[#0B2545]">
+                  Observation Category:
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {categories.map(cat => (
@@ -247,10 +241,10 @@ export const ReportPage: React.FC<ReportPageProps> = ({
                       key={cat}
                       type="button"
                       onClick={() => setCategory(cat)}
-                      className={`p-2.5 rounded-xl border text-xs font-medium text-left transition-colors ${
+                      className={`p-2.5 rounded-lg border text-xs font-medium text-left transition-colors ${
                         category === cat
-                          ? 'border-[#163828] bg-[#163828] text-white font-bold'
-                          : 'border-[#D5CBC0] bg-[#FAF8F5] text-[#4E5C53] hover:bg-[#EDE6DC]'
+                          ? 'border-[#0B2545] bg-[#0B2545] text-white font-bold'
+                          : 'border-[#CBD5E1] bg-[#F8FAFC] text-[#334155] hover:bg-[#EEF2F6]'
                       }`}
                     >
                       {cat}
@@ -261,48 +255,47 @@ export const ReportPage: React.FC<ReportPageProps> = ({
 
               {/* Description */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#163828]">
-                  Specific Details & Description:
+                <label className="text-xs font-bold uppercase tracking-wider text-[#0B2545]">
+                  Factual Observation & Details:
                 </label>
                 <textarea
                   rows={4}
                   value={description}
                   onChange={e => setDescription(e.target.value)}
-                  placeholder="Describe your observation objectively (date, item name, physical condition noticed)..."
-                  className="w-full p-3.5 rounded-xl border border-[#D5CBC0] text-sm text-[#163828] focus:ring-2 focus:ring-[#163828] focus:outline-none"
+                  placeholder="Provide date/time, specific food item or area observed, and objective details..."
+                  className="w-full p-3.5 rounded-lg border border-[#CBD5E1] text-sm text-[#0F172A] focus:ring-2 focus:ring-[#0B2545] focus:outline-none"
                   required
                 />
               </div>
 
               {/* Photo Evidence Drag-and-drop placeholder */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#163828]">
-                  Attach Photographic Evidence (Optional):
+                <label className="text-xs font-bold uppercase tracking-wider text-[#0B2545]">
+                  Attach Supporting Evidence (Optional):
                 </label>
-                <div className="p-6 rounded-2xl border-2 border-dashed border-[#D5CBC0] bg-[#FAF8F5] text-center space-y-2 hover:bg-[#F4ECE3] transition-colors cursor-pointer">
-                  <UploadCloud className="w-8 h-8 text-[#79877F] mx-auto" />
-                  <div className="text-xs text-[#526057]">
-                    <span className="font-bold text-[#163828]">Click to upload</span> or drag and
-                    drop photo/bill receipt
+                <div className="p-6 rounded-xl border-2 border-dashed border-[#CBD5E1] bg-[#F8FAFC] text-center space-y-1.5 hover:bg-[#EEF2F6] transition-colors cursor-pointer">
+                  <UploadCloud className="w-7 h-7 text-[#475569] mx-auto" />
+                  <div className="text-xs text-[#334155]">
+                    <span className="font-bold text-[#0B2545]">Select file</span> or drag and drop photo/bill receipt
                   </div>
-                  <span className="text-[10.5px] text-[#86958D] block">
-                    PNG, JPG, PDF up to 10MB (Prototype demo)
+                  <span className="text-[10.5px] text-[#64748B] block">
+                    PNG, JPG, PDF up to 10MB (Pilot demonstration upload)
                   </span>
                 </div>
               </div>
 
               {/* Anonymous Checkbox */}
-              <div className="flex items-center gap-3 p-3 bg-[#FAF8F5] rounded-xl border border-[#E6DFD5]">
+              <div className="flex items-center gap-3 p-3.5 bg-[#F8FAFC] rounded-lg border border-[#CBD5E1]">
                 <input
                   type="checkbox"
                   id="anonymousCheck"
                   checked={isAnonymous}
                   onChange={e => setIsAnonymous(e.target.checked)}
-                  className="w-4 h-4 rounded text-[#163828] focus:ring-[#163828]"
+                  className="w-4 h-4 rounded text-[#0B2545] focus:ring-[#0B2545]"
                 />
-                <label htmlFor="anonymousCheck" className="text-xs text-[#4F5E55] cursor-pointer">
-                  <strong>Submit Anonymously:</strong> Keep my phone and identity private from the
-                  food business and public view.
+                <label htmlFor="anonymousCheck" className="text-xs text-[#334155] cursor-pointer">
+                  <strong className="text-[#0B2545]">Submit Anonymously:</strong> Withhold my identity from
+                  the food establishment and public logs.
                 </label>
               </div>
 
@@ -310,9 +303,9 @@ export const ReportPage: React.FC<ReportPageProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitting || !description.trim()}
-                className="w-full py-3.5 rounded-xl bg-[#163828] text-white text-sm font-bold hover:bg-[#1f4a36] disabled:opacity-40 transition-colors shadow-sm"
+                className="w-full py-3.5 rounded-lg bg-[#0B2545] text-white text-sm font-bold hover:bg-[#13315C] disabled:opacity-40 transition-colors shadow-xs"
               >
-                {isSubmitting ? 'Routing to Jabalpur Food Authority...' : 'Submit Citizen Concern'}
+                {isSubmitting ? 'Dispatching to Jabalpur Food Authority...' : 'Register Official Grievance'}
               </button>
             </form>
           )}
@@ -321,23 +314,23 @@ export const ReportPage: React.FC<ReportPageProps> = ({
 
       {/* MODE 2: TRACK REPORT */}
       {activeMode === 'track' && (
-        <div className="bg-white rounded-3xl border border-[#E6DFD5] p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="bg-white rounded-xl border border-[#CBD5E1] p-6 sm:p-8 shadow-xs space-y-6">
           <form onSubmit={handleTrackSubmit} className="space-y-3">
-            <label className="text-xs font-bold uppercase tracking-wider text-[#163828]">
-              Enter Report Tracking ID:
+            <label className="text-xs font-bold uppercase tracking-wider text-[#0B2545]">
+              Enter Grievance Docket ID:
             </label>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={trackingIdInput}
                 onChange={e => setTrackingIdInput(e.target.value)}
-                placeholder="e.g. REP-JBP-8421"
-                className="flex-1 px-4 py-2.5 rounded-xl border border-[#D5CBC0] font-mono uppercase text-sm text-[#163828] focus:ring-2 focus:ring-[#163828]"
+                placeholder="e.g. REP-JBP-8492"
+                className="flex-1 px-4 py-2.5 rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] font-mono uppercase text-sm text-[#0B2545] focus:ring-2 focus:ring-[#0B2545]"
               />
               <button
                 type="submit"
                 disabled={isTrackSearching}
-                className="px-5 py-2.5 bg-[#163828] text-white text-xs font-bold rounded-xl hover:bg-[#1f4a36]"
+                className="px-5 py-2.5 bg-[#0B2545] text-white text-xs font-bold rounded-lg hover:bg-[#13315C]"
               >
                 {isTrackSearching ? 'Checking...' : 'Check Status'}
               </button>
@@ -345,46 +338,62 @@ export const ReportPage: React.FC<ReportPageProps> = ({
           </form>
 
           {trackError && (
-            <div className="p-4 bg-[#FEF2F2] rounded-xl border border-[#FECACA] text-[#991B1B] text-xs">
-              No complaint found with ID "{trackingIdInput}". Try searching demo code:{' '}
+            <div className="p-4 bg-[#FEF2F2] rounded-lg border border-[#FECACA] text-[#991B1B] text-xs">
+              No docket found with ID “{trackingIdInput}”. Try sample dockets:{' '}
               <button
                 type="button"
                 onClick={() => {
-                  setTrackingIdInput('REP-JBP-8421');
-                  handleTrackSubmit({ preventDefault: () => {} } as any);
+                  setTrackingIdInput('REP-JBP-8492');
+                  trackComplaint('REP-JBP-8492').then(r => {
+                    setTrackedReport(r);
+                    setTrackError(!r);
+                  });
+                }}
+                className="underline font-bold font-mono mr-2"
+              >
+                REP-JBP-8492
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setTrackingIdInput('REP-JBP-9104');
+                  trackComplaint('REP-JBP-9104').then(r => {
+                    setTrackedReport(r);
+                    setTrackError(!r);
+                  });
                 }}
                 className="underline font-bold font-mono"
               >
-                REP-JBP-8421
+                REP-JBP-9104
               </button>
             </div>
           )}
 
           {trackedReport && (
-            <div className="p-6 rounded-2xl bg-[#FAF8F5] border border-[#E6DFD5] space-y-6 animate-in fade-in">
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E6DFD5] pb-4">
+            <div className="p-6 rounded-xl bg-[#F8FAFC] border border-[#CBD5E1] space-y-6 animate-in fade-in">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#CBD5E1] pb-4">
                 <div>
-                  <span className="text-[10px] font-bold text-[#D97724] uppercase tracking-wider">
-                    COMPLAINT DOSSIER
+                  <span className="text-[10px] font-bold text-[#B45309] uppercase tracking-wider">
+                    GRIEVANCE DOCKET
                   </span>
-                  <h3 className="text-lg font-bold text-[#163828] font-mono">
+                  <h3 className="text-lg font-bold text-[#0B2545] font-mono">
                     {trackedReport.reportId}
                   </h3>
-                  <p className="text-xs text-[#627169]">
-                    Against: <strong>{trackedReport.businessName}</strong> ({trackedReport.category})
+                  <p className="text-xs text-[#475569]">
+                    Establishment: <strong className="text-[#0B2545]">{trackedReport.businessName}</strong> · {trackedReport.category}
                   </p>
                 </div>
 
-                <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#EBF7EE] text-[#1B5E20] border border-[#C8E6C9]">
+                <span className="text-xs font-bold px-3 py-1 rounded-md bg-[#ECFDF5] text-[#14532D] border border-[#86EFAC]">
                   {trackedReport.status}
                 </span>
               </div>
 
               {/* Progress Stepper */}
               <div className="space-y-2">
-                <span className="text-xs font-bold text-[#163828]">Official Resolution Stage:</span>
-                <div className="grid grid-cols-5 gap-1 pt-1">
-                  {statusWorkflow.map((item, idx) => {
+                <span className="text-xs font-bold text-[#0B2545]">Resolution Workflow Stage:</span>
+                <div className="grid grid-cols-5 gap-1.5 pt-1">
+                  {statusWorkflow.map(item => {
                     const currentStep = getActiveStep(trackedReport.status);
                     const isCompleted = currentStep >= item.step;
                     const isCurrent = currentStep === item.step;
@@ -392,17 +401,17 @@ export const ReportPage: React.FC<ReportPageProps> = ({
                     return (
                       <div key={item.step} className="space-y-1.5">
                         <div
-                          className={`h-2 rounded-full transition-colors ${
-                            isCompleted ? 'bg-[#2D7A4D]' : 'bg-[#E5DDD0]'
+                          className={`h-2 rounded-sm transition-colors ${
+                            isCompleted ? 'bg-[#14532D]' : 'bg-[#CBD5E1]'
                           }`}
                         />
                         <span
-                          className={`text-[9px] sm:text-[10px] block leading-tight font-medium ${
+                          className={`text-[9.5px] sm:text-[10px] block leading-tight font-medium ${
                             isCurrent
-                              ? 'text-[#163828] font-bold'
+                              ? 'text-[#0B2545] font-bold'
                               : isCompleted
-                              ? 'text-[#2D7A4D]'
-                              : 'text-[#9AA8A0]'
+                              ? 'text-[#14532D]'
+                              : 'text-[#64748B]'
                           }`}
                         >
                           {item.label}
@@ -414,13 +423,13 @@ export const ReportPage: React.FC<ReportPageProps> = ({
               </div>
 
               {/* Finding & Authority Note */}
-              <div className="p-4 bg-white rounded-xl border border-[#E6DFD5] space-y-1 text-xs">
-                <div className="flex items-center justify-between text-[#819087] text-[11px]">
-                  <span>Authority: {trackedReport.authorityAssigned}</span>
-                  <span>Logged: {trackedReport.dateReported}</span>
+              <div className="p-4 bg-white rounded-lg border border-[#CBD5E1] space-y-1.5 text-xs">
+                <div className="flex flex-wrap items-center justify-between text-[#475569] text-[11px]">
+                  <span>Assigned Officer: <strong className="text-[#0B2545]">{trackedReport.authorityAssigned}</strong></span>
+                  <span className="tabular-nums">Filed: {trackedReport.dateReported}</span>
                 </div>
-                <p className="text-[#3F4D45] pt-1">
-                  <strong>Officer Action Log:</strong> {trackedReport.findingNote}
+                <p className="text-[#334155] pt-1">
+                  <strong className="text-[#0B2545]">Official Action Log:</strong> {trackedReport.findingNote}
                 </p>
               </div>
             </div>

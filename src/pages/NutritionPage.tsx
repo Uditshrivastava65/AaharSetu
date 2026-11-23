@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import {
   Apple,
   Search,
-  Filter,
-  Flame,
   Info,
   ShieldCheck,
   Sparkles,
@@ -11,7 +9,6 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import { NUTRITION_ITEMS } from '../data/mockData';
-import { NutritionItem } from '../types';
 
 interface NutritionPageProps {
   onOpenAI: (initialQuery?: string) => void;
@@ -20,88 +17,90 @@ interface NutritionPageProps {
 
 export const NutritionPage: React.FC<NutritionPageProps> = ({ onOpenAI, isHindi }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTag, setSelectedTag] = useState<string>('All');
-  const [expandedDishId, setExpandedDishId] = useState<string | null>(NUTRITION_ITEMS[0].id);
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [expandedDishId, setExpandedDishId] = useState<string | null>(NUTRITION_ITEMS[0]?.id || null);
 
-  const tags = [
+  const categories = [
     'All',
-    'High-Protein',
-    'Vegetarian',
-    'Vegan',
-    'Gluten-Free',
-    'Diabetic-Friendly',
-    'Regional Specialty',
+    'Breakfast',
+    'Lentils & Curries',
+    'Dairy',
+    'Staples',
+    'Produce',
+    'Snacks',
   ];
 
   const filteredItems = NUTRITION_ITEMS.filter(item => {
+    const nutrients = item.keyIngredients || item.vitaminsAndMinerals || [];
     const matchesSearch =
       !searchQuery.trim() ||
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.hindiName.includes(searchQuery) ||
-      item.keyIngredients.some(i => i.toLowerCase().includes(searchQuery.toLowerCase()));
+      item.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      nutrients.some(i => i.toLowerCase().includes(searchQuery.toLowerCase()));
 
-    const matchesTag =
-      selectedTag === 'All' || item.dietarySuitability.includes(selectedTag as any);
+    const matchesCategory =
+      selectedCategory === 'All' || item.category === selectedCategory;
 
-    return matchesSearch && matchesTag;
+    return matchesSearch && matchesCategory;
   });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header Banner */}
-      <div className="bg-[#FAF6F0] rounded-3xl p-6 sm:p-10 border border-[#E6DDD0] relative overflow-hidden">
+      <div className="bg-[#0B2545] text-white rounded-xl p-6 sm:p-10 border border-[#1E3A5F] shadow-md gov-grid-pattern relative overflow-hidden">
         <div className="max-w-3xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF0E6] text-[#D97724] text-xs font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#071A33] border border-[#1E3A5F] text-[#FBBF24] text-xs font-bold uppercase tracking-wider">
             <Apple className="w-3.5 h-3.5" />
-            <span>{isHindi ? 'भारतीय पोषण ज्ञानकोष' : 'Nutrition Awareness Portal'}</span>
+            <span>{isHindi ? 'भारतीय पोषण एवं आहार विज्ञान पंजिका' : 'ICMR-NIN Aligned Nutrition Registry'}</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#163828] tracking-tight">
-            {isHindi ? 'अपने भोजन का पोषण समझें' : 'Understand What You Eat'}
+          <h1 className="text-3xl sm:text-4xl font-serif font-bold text-white tracking-tight">
+            {isHindi ? 'अपने भोजन का पोषण समझें' : 'Public Nutrition & Food Literacy'}
           </h1>
-          <p className="text-sm sm:text-base text-[#525F56] leading-relaxed">
-            Educational nutrition profiles and culinary science for popular Indian and regional
-            dishes. Learn macronutrient balances, glycemic ratings, and kitchen hygiene safety tips.
+          <p className="text-sm sm:text-base text-[#CBD5E1] leading-relaxed">
+            Reference macronutrient balances, glycemic index indicators, and kitchen safety guidance
+            for everyday Indian and Madhya Pradesh regional preparations.
           </p>
         </div>
 
         {/* AI Prompt CTA trigger */}
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <button
-            onClick={() => onOpenAI('What is the nutritional balance of Dal Bafla?')}
-            className="px-4 py-2 rounded-xl bg-[#163828] text-white text-xs font-bold hover:bg-[#1f4a36] transition-colors flex items-center gap-2 shadow-xs"
+            onClick={() => onOpenAI('What is the nutritional balance of Dal Bafla and Poha?')}
+            className="px-4 py-2.5 rounded-lg bg-[#B45309] text-white text-xs font-bold hover:bg-[#92400E] transition-colors flex items-center gap-2 shadow-xs"
           >
-            <Sparkles className="w-3.5 h-3.5 text-[#E28738]" />
-            <span>Ask Aahar AI about custom recipes</span>
+            <Sparkles className="w-3.5 h-3.5 text-[#FDE68A]" />
+            <span>Consult Aahar AI on Meal Nutrition</span>
           </button>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <div className="relative w-full sm:max-w-md">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7E8B83]" />
+      <div className="bg-[#F8FAFC] p-4 rounded-xl border border-[#CBD5E1] flex flex-col lg:flex-row gap-4 items-center justify-between">
+        <div className="relative w-full lg:max-w-md">
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#475569]" />
           <input
             type="text"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Search dish name (e.g. Poha, Dal Bafla, Paneer)..."
-            className="w-full pl-10 pr-4 py-2 bg-white rounded-xl border border-[#D5CBC0] text-sm text-[#163828] focus:outline-none focus:ring-2 focus:ring-[#163828]"
+            placeholder="Search dish or micronutrient (e.g. Poha, Iron, Paneer)..."
+            className="w-full pl-10 pr-4 py-2 bg-white rounded-lg border border-[#CBD5E1] text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#0B2545]"
           />
         </div>
 
-        {/* Dietary suitability tags */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar w-full sm:w-auto">
-          {tags.map(tag => (
+        {/* Food Group Categories */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar w-full lg:w-auto">
+          {categories.map(cat => (
             <button
-              key={tag}
-              onClick={() => setSelectedTag(tag)}
-              className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
-                selectedTag === tag
-                  ? 'bg-[#163828] text-white'
-                  : 'bg-white border border-[#D5CBC0] text-[#55635B] hover:bg-[#EDE6DC]'
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-colors border ${
+                selectedCategory === cat
+                  ? 'bg-[#0B2545] text-white border-[#0B2545]'
+                  : 'bg-white border-[#CBD5E1] text-[#334155] hover:bg-[#EEF2F6]'
               }`}
             >
-              {tag}
+              {cat}
             </button>
           ))}
         </div>
@@ -111,119 +110,102 @@ export const NutritionPage: React.FC<NutritionPageProps> = ({ onOpenAI, isHindi 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredItems.map(dish => {
           const isExpanded = expandedDishId === dish.id;
+          const portion = dish.portionSize || dish.servingSize;
+          const fatValue = dish.fats ?? dish.fat;
+          const nutrients = dish.keyIngredients || dish.vitaminsAndMinerals || [];
+          const safetyGuidance = dish.foodSafetyTip || dish.healthTip;
 
           const giColor =
             dish.glycemicIndex === 'Low'
-              ? 'bg-[#EBF7EE] text-[#1B5E20] border-[#C8E6C9]'
+              ? 'bg-[#ECFDF5] text-[#14532D] border-[#86EFAC]'
               : dish.glycemicIndex === 'Medium'
-              ? 'bg-[#FEF7EC] text-[#B45309] border-[#FDE68A]'
+              ? 'bg-[#FFFBEB] text-[#B45309] border-[#FDE68A]'
               : 'bg-[#FEF2F2] text-[#991B1B] border-[#FECACA]';
 
           return (
             <div
               key={dish.id}
-              className="bg-white rounded-2xl border border-[#E6DFD5] overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
+              className="bg-white rounded-xl border border-[#CBD5E1] overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
             >
               <div className="p-5 space-y-4">
                 {/* Top Title & GI Badge */}
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <h3 className="text-lg font-extrabold text-[#163828] leading-tight">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#B45309] block mb-0.5">
+                      {dish.category}
+                    </span>
+                    <h3 className="text-lg font-serif font-bold text-[#0B2545] leading-tight">
                       {dish.name}
                     </h3>
-                    <span className="text-xs text-[#829087] font-medium font-sans">
-                      {dish.hindiName} • {dish.portionSize}
+                    <span className="text-xs text-[#475569] font-medium">
+                      {dish.hindiName} · {portion}
                     </span>
                   </div>
                   <span
-                    className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${giColor}`}
+                    className={`text-[10.5px] font-bold px-2.5 py-0.5 rounded-md border shrink-0 ${giColor}`}
                     title={`Glycemic Index: ${dish.glycemicIndex}`}
                   >
                     GI: {dish.glycemicIndex}
                   </span>
                 </div>
 
-                {/* Macronutrient Pills */}
-                <div className="grid grid-cols-4 gap-2 text-center py-3 px-2.5 bg-[#FAF7F2] rounded-xl border border-[#ECE5DA]">
+                {/* Macronutrient Ledger */}
+                <div className="grid grid-cols-4 gap-2 text-center py-3 px-2.5 bg-[#EEF2F6] rounded-lg border border-[#CBD5E1] tabular-nums">
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-[#839188] block">
+                    <span className="text-[10px] uppercase font-bold text-[#475569] block">
                       Calories
                     </span>
-                    <span className="text-sm font-black text-[#163828]">
+                    <span className="text-sm font-black text-[#0B2545]">
                       {dish.calories}
                     </span>
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-[#839188] block">
+                    <span className="text-[10px] uppercase font-bold text-[#475569] block">
                       Protein
                     </span>
-                    <span className="text-sm font-black text-[#2D7A4D]">
-                      {dish.protein}
+                    <span className="text-sm font-black text-[#14532D]">
+                      {dish.protein}g
                     </span>
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-[#839188] block">
+                    <span className="text-[10px] uppercase font-bold text-[#475569] block">
                       Carbs
                     </span>
-                    <span className="text-sm font-black text-[#D97724]">
-                      {dish.carbs}
+                    <span className="text-sm font-black text-[#B45309]">
+                      {dish.carbs}g
                     </span>
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-[#839188] block">
-                      Fats
+                    <span className="text-[10px] uppercase font-bold text-[#475569] block">
+                      Fat
                     </span>
-                    <span className="text-sm font-black text-[#69776E]">
-                      {dish.fats}
+                    <span className="text-sm font-black text-[#334155]">
+                      {fatValue}g
                     </span>
                   </div>
                 </div>
 
-                {/* Key Ingredients */}
-                <div className="space-y-1">
-                  <span className="text-[10.5px] uppercase font-bold text-[#839188] tracking-wider block">
-                    Core Ingredients:
+                {/* Micronutrients & Composition */}
+                <div className="space-y-1.5">
+                  <span className="text-[10.5px] uppercase font-bold text-[#475569] tracking-wider block">
+                    Key Vitamins, Minerals & Fibre ({dish.fiber}g fibre):
                   </span>
-                  <div className="flex flex-wrap gap-1">
-                    {dish.keyIngredients.map(ing => (
-                      <span
-                        key={ing}
-                        className="text-xs bg-[#FAF8F5] border border-[#E6DFD5] px-2 py-0.5 rounded text-[#4E5C53]"
-                      >
-                        {ing}
-                      </span>
-                    ))}
-                  </div>
+                  <p className="text-xs text-[#334155] leading-relaxed">
+                    {nutrients.join(' · ')}
+                  </p>
                 </div>
 
-                {/* Dietary Badges */}
-                <div className="flex flex-wrap gap-1 pt-1">
-                  {(Array.isArray(dish.dietarySuitability)
-                    ? dish.dietarySuitability
-                    : dish.dietarySuitability
-                    ? [dish.dietarySuitability]
-                    : []
-                  ).map(tag => (
-                    <span
-                      key={tag}
-                      className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EBF7EE] text-[#1B5E20]"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Expandable Safety & Hygiene Tips */}
+                {/* Expandable Safety & Nutrition Guidance */}
                 {isExpanded && (
-                  <div className="pt-3 border-t border-[#F0EAE1] space-y-2 text-xs">
-                    <div className="flex items-start gap-2 text-[#2F4735] bg-[#F4FAF6] p-2.5 rounded-xl border border-[#D3E8DA]">
-                      <ShieldCheck className="w-4 h-4 text-[#2D7A4D] shrink-0 mt-0.5" />
+                  <div className="pt-3 border-t border-[#E2E8F0] space-y-2 text-xs">
+                    <div className="flex items-start gap-2.5 text-[#0F172A] bg-[#F8FAFC] p-3 rounded-lg border border-[#CBD5E1]">
+                      <ShieldCheck className="w-4 h-4 text-[#14532D] shrink-0 mt-0.5" />
                       <div>
-                        <strong className="block text-[11px] uppercase font-bold text-[#163828]">
-                          Food Safety & Kitchen Practice:
+                        <strong className="block text-[11px] uppercase font-bold text-[#0B2545] mb-0.5">
+                          Nutritional Science & Hygiene Note:
                         </strong>
-                        <p className="text-[11.5px] text-[#475C4D] leading-snug">
-                          {dish.foodSafetyTip}
+                        <p className="text-[11.5px] text-[#334155] leading-snug">
+                          {safetyGuidance}
                         </p>
                       </div>
                     </div>
@@ -232,23 +214,23 @@ export const NutritionPage: React.FC<NutritionPageProps> = ({ onOpenAI, isHindi 
               </div>
 
               {/* Bottom toggle / ask AI button */}
-              <div className="px-5 py-3 bg-[#FAF8F5] border-t border-[#E6DFD5] flex items-center justify-between text-xs">
+              <div className="px-5 py-3 bg-[#F8FAFC] border-t border-[#CBD5E1] flex items-center justify-between text-xs">
                 <button
                   onClick={() => setExpandedDishId(isExpanded ? null : dish.id)}
-                  className="font-bold text-[#163828] hover:text-[#D97724] flex items-center gap-1"
+                  className="font-bold text-[#0B2545] hover:text-[#B45309] flex items-center gap-1"
                 >
-                  <span>{isExpanded ? 'Hide Safety Tip' : 'Food Safety Tip'}</span>
+                  <span>{isExpanded ? 'Hide Advisory' : 'Read Science & Safety Tip'}</span>
                   {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                 </button>
 
                 <button
                   onClick={() =>
-                    onOpenAI(`Tell me about the health benefits and digestion of ${dish.name}`)
+                    onOpenAI(`Tell me about the nutritional balance and safe preparation of ${dish.name}`)
                   }
-                  className="text-xs font-semibold text-[#D97724] hover:underline flex items-center gap-1"
+                  className="text-xs font-bold text-[#B45309] hover:underline flex items-center gap-1"
                 >
                   <Sparkles className="w-3 h-3" />
-                  <span>Ask AI</span>
+                  <span>Ask Aahar AI</span>
                 </button>
               </div>
             </div>
@@ -257,13 +239,12 @@ export const NutritionPage: React.FC<NutritionPageProps> = ({ onOpenAI, isHindi 
       </div>
 
       {/* Disclaimers Card */}
-      <div className="p-4 bg-[#FAF8F5] rounded-2xl border border-[#E6DFD5] text-xs text-[#6F7D75] flex items-start gap-3 max-w-3xl">
-        <Info className="w-4 h-4 text-[#D97724] shrink-0 mt-0.5" />
+      <div className="p-4 bg-[#F8FAFC] rounded-xl border border-[#CBD5E1] text-xs text-[#475569] flex items-start gap-3 max-w-3xl">
+        <Info className="w-4 h-4 text-[#B45309] shrink-0 mt-0.5" />
         <div>
-          <strong>Educational Awareness Disclaimer:</strong> Nutritional figures and glycemic indices
-          are reference estimates based on standard Indian recipes (ICMR-NIN guidelines). Exact
-          caloric counts vary based on commercial preparation styles, ghee/oil portions, and
-          serving quantities.
+          <strong className="text-[#0B2545]">Public Educational Reference:</strong> Nutritional values and
+          glycemic estimates follow standard ICMR-NIN Indian recipe benchmarks. Actual energy density
+          varies with oil/ghee quantities and portion sizes.
         </div>
       </div>
     </div>
