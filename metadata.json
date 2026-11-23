@@ -1,0 +1,8 @@
+{
+  "name": "AaharSetu",
+  "description": "Citizen-facing food-business transparency and verification platform. Know. Verify. Eat with Confidence.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
